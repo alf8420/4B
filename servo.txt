@@ -1,0 +1,46 @@
+/*
+This program was writing by Alfonso Contreras
+for the class CPE 301, with Dr. Venkatesan Muthukumar
+and what this program does is to control a servo motor
+which rotates from 0 to 180 degrees and it could be 
+control with a potentiometer, when this one is @ 0 volts
+it does not rotate, but when the potentiometer is with less
+resistance @ 5 volts it allows the servo rotate 180 degrees.
+
+
+*/
+
+#define F_CPU 8000000L
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
+
+
+int main(void)
+{
+	DDRC = 0xFF; //C port as output to control with the potentiometer
+	DDRB = 0xFF;
+	
+	
+	//	TIMER1 Configuration
+	TCCR1A|=(1<<COM1A1)|(1<<WGM11);	// non Inverted	PWM
+	//prescaler 64 
+	TCCR1B|=(1<<WGM13)|(1<<WGM12)|(1<<CS11)|(1<<CS10);
+	ICR1=4999;		                     //frequency=50Hz
+	DDRB|=(1<<PB1)|(1<<PB2);			//PWM pins out
+	
+	while(1)
+	{
+		
+		_delay_ms(2000);
+		OCR1A=499;	//180 degrees   //so the calculation was 8Mhz/64 * 0.001-1
+		
+		
+		
+		_delay_ms(2000);
+		OCR1A=124;	//0 degrees
+		
+
+	}
+
+}

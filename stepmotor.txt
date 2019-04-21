@@ -1,0 +1,64 @@
+/*
+This program was writing by Alfonso Contreras
+for the class CPE 301, with Dr. Venkatesan Muthukumar
+and what this program does is to control a step motor,
+the potentiometer is connected to PC0 and then depending on the
+resistance of the potentiometer it allows the step motor to rotate 
+faster.
+
+*/
+
+#define F_CPU 16000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
+#include <stdio.h>
+
+int main(void)
+{
+	DDRB = 0xFF; //B port as output for the driver ULN2003A 
+	DDRC = 0xFF; //C port as output to control with the potentiometer
+	OCR0A = 40;		
+	TCCR0B |= (1<<CS01|1<<CS00);	//intenal clk, No prescaler
+	TCCR0A |= (1<<WGM01);	//CTC mode
+	
+	
+    sei(); //enable global interrupts
+	while(1)
+	{
+		for(int i = 0; i <= 6; i++)
+		{
+		PORTB = 0x0C;
+		_delay_ms(50);
+		PORTB = 0x09;
+		_delay_ms(50);
+		PORTB = 0x03;
+		_delay_ms(50);
+		PORTB = 0x06;
+		_delay_ms(50);
+		}
+		_delay_ms(100);
+		for(int i = 0; i <= 10; i++)
+		{
+		PORTB = 0x06;
+		_delay_ms(50);
+		PORTB = 0x03;
+		_delay_ms(50);
+		PORTB = 0x09;
+		_delay_ms(50);
+		PORTB = 0x0C;
+		_delay_ms(50);
+		}
+	}
+}
+
+
+ISR (TIM0_OVF_vect)	//ISR for Timer0 overflow
+{
+	TCNT0 = 40;
+	PORTB ^= 0xFF;		//toggle PORTB
+	TIFR0 |= (1<<TOV0); //clear the overflow flag
+}
+
+
+
